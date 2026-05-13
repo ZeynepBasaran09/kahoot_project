@@ -19,6 +19,8 @@ let zamanSayaci;
 let kalanSure = 20;
 let toplamPuanim = 0;
 let canSayisi = 3;
+let elendiMi = false;
+let sonElenisNedeni = "Tüm canlarını kaybettin!";
 
 let hostOyuncuListesi = {};
 let aktifSoruCevaplari = {};
@@ -82,10 +84,17 @@ $(document).ready(function () {
         if (kanal === "Liderlik") {
             ortakLiderlikTablosunuCiz(veri);
             if (veri[oyuncuID]) {
+                let eskiCan = canSayisi;
                 toplamPuanim = veri[oyuncuID].puan;
                 canSayisi = veri[oyuncuID].can;
                 $("#puan-gosterge").text(`Puan: ${toplamPuanim}`);
                 canlariGuncelle();
+
+                // Oyuncu yeni elenindiyse popup göster
+                if (eskiCan > 0 && canSayisi <= 0 && !elendiMi && oyunBasladiMi) {
+                    elendiMi = true;
+                    elenisPopupGoster(sonElenisNedeni);
+                }
             }
         }
     });
@@ -124,6 +133,18 @@ $(document).ready(function () {
 
     $("#btn-admin-panel").click(() => {
         alert("Bu modda soru ekleme kapalıdır.");
+    });
+
+    // Eleniş popup butonları
+    $("#btn-elenis-ayril").click(() => {
+        window.location.href = window.location.pathname;
+    });
+
+    $("#btn-elenis-izle").click(() => {
+        let modal = bootstrap.Modal.getInstance(document.getElementById("elenisModal"));
+        if (modal) modal.hide();
+        // Quiz ekranını izleyici moduna al
+        $("#quiz-ekrani").removeClass("d-none");
     });
 });
 
@@ -360,10 +381,13 @@ function oyunDurumunuYorumla(veri) {
 function oyuncuSoruyuCiz(soruVerisi) {
     suAnkiSoruSirasi = soruVerisi.soruIndex;
 
+    // Elenmiş oyuncu quiz ekranında izleyici modunda takip edebilir
     if (canSayisi <= 0) {
-        $("#soru-sayaci-yazi").text("Elendin");
-        $("#soru-metni").html("<h3 class='text-danger'>Canın bitti! Oyunu izleyebilirsin. 💀</h3>");
+        $("#soru-sayaci-yazi").text(`Soru ${soruVerisi.soruIndex + 1}/${soruVerisi.toplamSoru} — 👁️ İzliyorsunuz`);
+        $("#quiz-progress-bar").css("width", ((soruVerisi.soruIndex + 1) / soruVerisi.toplamSoru * 100) + "%");
+        $("#soru-metni").html(`<span class="badge bg-secondary me-2">${soruVerisi.soruObjesi.zorluk}</span> ${guvenliYazi(soruVerisi.soruObjesi.soru)}`);
         $("#secenekler-alani").empty();
+        $("#secenekler-alani").html(`<div class="alert alert-dark text-center fw-bold"><i class="bi bi-eye-fill me-2"></i>Elendiniz — Yarışmayı izliyorsunuz 👀</div>`);
         $("#sayac-metni").text("-");
         return;
     }
@@ -407,6 +431,7 @@ function oyuncuSureBaslat(soruVerisi) {
             clearInterval(zamanSayaci);
             $(".secenek-btn").prop("disabled", true);
             alan.prepend(`<div class="alert alert-danger fw-bold text-center">Süre bitti! Cevap vermediysen can gider.</div>`);
+            sonElenisNedeni = "Süre bitti ve cevap vermedin!";
         }
 
         $("#sayac-metni").text(kalanSure);
@@ -433,6 +458,7 @@ function oyuncuCevapVer(secilenIndeks, butonHTML, soruVerisi) {
         kazanilanPuan = Math.max(10, Math.floor((kalanMs / 20000) * 1000));
     } else {
         $(butonHTML).addClass("yanlis").append(" ❌");
+        sonElenisNedeni = "Yanlış cevap verdin ve tüm canlarını tüketti!";
     }
 
     $("#secenekler-alani").prepend(`<div class="alert alert-success fw-bold text-center">Cevabın kaydedildi. Diğer oyuncular bekleniyor...</div>`);
@@ -500,6 +526,40 @@ function cevapVermeyenleriEle() {
             }
         }
     });
+
+    // Kendi elenme nedenini güncelle (süre bitti cevap vermedi)
+    if (hostOyuncuListesi[oyuncuID] && !hostOyuncuListesi[oyuncuID].cevapVerdi) {
+        sonElenisNedeni = "Süre bitti ve cevap vermedin!";
+    }
+}
+
+// ==========================================
+// ELENİŞ POPUP
+// ==========================================
+
+function elenisPopupGoster(neden) {
+    clearInterval(zamanSayaci);
+
+    // Eleniş nedenini belirle
+    let nedenMetni = neden || "Tüm canlarını kaybettin!";
+    let ikon = "💀";
+    let baslik = "Elendiniz!";
+
+    // Son yanlış cevap mı yoksa süre bitti mi?
+    if (nedenMetni.includes("Süre bitti")) {
+        ikon = "⏰";
+        baslik = "Süre Doldu!";
+    } else if (nedenMetni.includes("Yanlış") || nedenMetni.includes("yanlis") || nedenMetni.includes("yanlış")) {
+        ikon = "❌";
+        baslik = "Elendiniz!";
+    }
+
+    $("#elenis-ikon").text(ikon);
+    $("#elenis-baslik").text(baslik);
+    $("#elenis-neden-metni").text(nedenMetni);
+
+    let modal = new bootstrap.Modal(document.getElementById("elenisModal"));
+    modal.show();
 }
 
 // ==========================================
@@ -524,6 +584,13 @@ function oyunuBitir() {
 function oyunuBitirveGoster(veri) {
     clearInterval(zamanSayaci);
     $("#quiz-ekrani").addClass("d-none");
+
+    // Eleniş popup'ı açıksa kapat
+    let elenisModalEl = document.getElementById("elenisModal");
+    let elenisModalInstance = bootstrap.Modal.getInstance(elenisModalEl);
+    if (elenisModalInstance) {
+        elenisModalInstance.hide();
+    }
 
     let modal = new bootstrap.Modal(document.getElementById("sonucModal"));
 
