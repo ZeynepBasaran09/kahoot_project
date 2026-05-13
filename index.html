@@ -188,6 +188,35 @@
         </div>
     </footer>
 
+    <!-- ELENİŞ MODALI -->
+    <div class="modal fade" id="elenisModal" data-bs-backdrop="static" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-0 shadow-lg" id="elenis-modal-content">
+                <div class="modal-header border-0 pb-0" style="background: linear-gradient(135deg, #dc3545, #7b0000); border-radius: 12px 12px 0 0;">
+                    <div class="w-100 text-center pt-2 pb-1">
+                        <div style="font-size: 4rem; line-height: 1;" id="elenis-ikon">💀</div>
+                        <h4 class="text-white fw-bold mt-2 mb-0" id="elenis-baslik">Elendiniz!</h4>
+                    </div>
+                </div>
+                <div class="modal-body text-center px-4 py-4">
+                    <div class="alert border-0 mb-3" id="elenis-neden-kutu" style="background-color: #fff3cd; border-radius: 10px;">
+                        <i class="bi bi-exclamation-triangle-fill text-warning me-2"></i>
+                        <span id="elenis-neden-metni" class="fw-semibold text-dark">Tüm canlarınızı kaybettiniz.</span>
+                    </div>
+                    <p class="text-muted mb-0 small">Yarışmayı izlemeye devam edebilir veya odadan ayrılabilirsiniz.</p>
+                </div>
+                <div class="modal-footer justify-content-center border-0 pb-4 gap-3">
+                    <button type="button" class="btn btn-outline-secondary btn-lg px-4 fw-bold" id="btn-elenis-ayril">
+                        <i class="bi bi-box-arrow-left me-2"></i>Odadan Ayrıl
+                    </button>
+                    <button type="button" class="btn btn-primary btn-lg px-4 fw-bold" id="btn-elenis-izle">
+                        <i class="bi bi-eye-fill me-2"></i>Yarışmayı İzle
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- SONUÇ MODALI -->
     <div class="modal fade" id="sonucModal" data-bs-backdrop="static" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered modal-lg">
