@@ -186,3 +186,30 @@ body.dark-mode .modal-content {
     background-color: #2c3034;
     color: #f8f9fa;
 }
+
+/* Eleniş Modal Özel Stilleri */
+#elenis-modal-content {
+    border-radius: 14px;
+    overflow: hidden;
+}
+
+body.dark-mode #elenis-neden-kutu {
+    background-color: #3a3000 !important;
+}
+
+body.dark-mode #elenis-neden-metni {
+    color: #ffc107 !important;
+}
+
+/* Eleniş ikonu sallanma animasyonu */
+#elenis-ikon {
+    display: inline-block;
+    animation: elenis-bounce 0.6s ease forwards;
+}
+
+@keyframes elenis-bounce {
+    0%   { transform: scale(0.3) rotate(-10deg); opacity: 0; }
+    60%  { transform: scale(1.2) rotate(5deg);  opacity: 1; }
+    80%  { transform: scale(0.9) rotate(-3deg); }
+    100% { transform: scale(1)   rotate(0deg);  }
+}
